@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS parameters...
+
+#Pipeline using GAWN version 0.3.2 suite by E. normandeau https://github.com/enormandeau/gawn/blob/master/README.md
+
+WORKING_DIRECTORY=	#path to working directory, containing gawn sub directories (01_scripts etc)
+SWISSPROT=		#pah to uniprot_swissprot db
+TR_NAME=		#transcriptome name. Must be in 03_data folder
+NCPU=16			#number of cpus
+
+cd $WORKING_DIRECTORY
+
+#Step 1 : Blastx transcriptome against swissprot
+bash 01_scripts/04_blast_transcriptome_on_swissprot.sh $TR_NAME $SWISSPROT $NCPU
+
+#Step 2 : Get uniprot infos
+bash 01_scripts/05_get_uniprot_info.sh $TR_NAME
+
+#Step 3 : Annotate transcriptome
+python 01_scripts/06_annotate_transcriptome_prev.py 03_data/${TR_NAME} 04_annotation/genbank_info 05_results/${TR_NAME%%.*}_annot.txt
